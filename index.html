@@ -1,0 +1,1396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bonovo — Your revenue function, on steroids.</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist-sans/style.css">
+  <style>
+    :root {
+      --color-bg: #FAFAF8;
+      --color-bg-muted: #F2F0EB;
+      --color-bg-dark: #111110;
+      --color-text: #1A1A18;
+      --color-text-muted: #6B6B68;
+      --color-text-light: #FAFAF8;
+      --color-accent: #E8603C;
+      --color-accent-light: #FDF1ED;
+      --color-border: #E8E6E0;
+      --font-display: 'Geist Sans', sans-serif;
+      --font-sans: 'Geist Sans', sans-serif;
+      --radius-sm: 6px;
+      --radius-md: 12px;
+      --max-width: 1200px;
+      --section-padding: 112px 24px;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font-sans);
+      background: var(--color-bg);
+      color: var(--color-text);
+      font-size: 17px;
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    .label {
+      font-size: 12px; font-weight: 500;
+      letter-spacing: 0.06em; text-transform: uppercase;
+      color: var(--color-text-muted);
+    }
+    .container { max-width: var(--max-width); margin: 0 auto; padding: 0 48px; }
+
+    /* ── BUTTONS ── */
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      padding: 11px 22px; border-radius: var(--radius-sm);
+      font-family: var(--font-sans); font-size: 14px; font-weight: 500;
+      cursor: pointer; text-decoration: none;
+      transition: opacity 0.2s, background 0.2s, color 0.2s;
+      border: 1.5px solid transparent; line-height: 1; white-space: nowrap;
+    }
+    .btn-primary { background: var(--color-text); color: white; border-color: var(--color-text); }
+    .btn-primary:hover { opacity: 0.78; }
+    .btn-secondary { background: transparent; color: var(--color-text); border-color: #C8C6C0; }
+    .btn-secondary:hover { border-color: var(--color-text); }
+    .btn-primary-dark { background: white; color: var(--color-text); border-color: white; }
+    .btn-primary-dark:hover { opacity: 0.88; }
+    .btn-secondary-dark { background: transparent; color: white; border-color: rgba(255,255,255,0.35); }
+    .btn-secondary-dark:hover { border-color: white; }
+
+    /* ── NAV ── */
+    .nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      padding: 18px 48px;
+      display: flex; align-items: center; justify-content: space-between;
+      transition: background 0.3s, box-shadow 0.3s;
+    }
+    .nav.scrolled {
+      background: rgba(250,250,248,0.94);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 1px 0 var(--color-border);
+    }
+    .nav-logo { display: flex; align-items: center; gap: 9px; text-decoration: none; }
+    .nav-mark {
+      width: 26px; height: 26px; background: var(--color-accent);
+      border-radius: 7px; display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .nav-wordmark {
+      font-family: var(--font-sans); font-size: 18px; font-weight: 600;
+      color: var(--color-text); letter-spacing: -0.02em;
+    }
+    .nav-actions { display: flex; align-items: center; gap: 10px; }
+    .nav-signin {
+      font-size: 14px; font-weight: 500; color: var(--color-text-muted);
+      text-decoration: none; padding: 8px 14px; transition: color 0.2s;
+    }
+    .nav-signin:hover { color: var(--color-text); }
+
+    /* ── SCROLL REVEAL ── */
+    .reveal {
+      opacity: 0; transform: translateY(22px);
+      transition: opacity 0.65s ease, transform 0.65s ease;
+    }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+    .reveal-d1 { transition-delay: 0.1s; }
+    .reveal-d2 { transition-delay: 0.2s; }
+    .reveal-d3 { transition-delay: 0.3s; }
+
+    /* ══════════════════════════════════════════
+       § 1 — HERO
+    ══════════════════════════════════════════ */
+    .hero {
+      min-height: 100vh; display: flex; flex-direction: column;
+      justify-content: center; padding: 140px 48px 80px;
+      position: relative; overflow: hidden;
+    }
+    .hero::before {
+      content: ''; position: absolute; inset: 0; opacity: 0.035;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size: 180px 180px; pointer-events: none; z-index: 0;
+    }
+    .hero-inner { max-width: var(--max-width); margin: 0 auto; width: 100%; position: relative; z-index: 1; }
+    .hero-label {
+      margin-bottom: 22px; opacity: 0;
+      animation: fadeUp 0.6s ease forwards; animation-delay: 0.1s;
+    }
+    .hero-headline {
+      font-family: var(--font-sans);
+      font-size: clamp(38px, 5vw, 64px);
+      font-weight: 500; line-height: 1.1; letter-spacing: -0.02em;
+      margin-bottom: 32px; max-width: 820px;
+    }
+    .hero-headline .line {
+      display: block; opacity: 0; animation: fadeUp 0.6s ease forwards;
+    }
+    .hero-headline .line:nth-child(1) { animation-delay: 0.22s; }
+    .hero-headline .line:nth-child(2) { animation-delay: 0.38s; }
+    .hero-subheadline {
+      font-size: 18px; font-weight: 400; color: var(--color-text-muted);
+      line-height: 1.65; max-width: 480px; margin-bottom: 36px;
+      opacity: 0; animation: fadeUp 0.6s ease forwards; animation-delay: 0.52s;
+    }
+    .hero-actions {
+      display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+      opacity: 0; animation: fadeUp 0.6s ease forwards; animation-delay: 0.66s;
+    }
+    .hero-ui-wrap {
+      margin-top: 64px;
+      opacity: 0; animation: fadeUp 0.9s ease forwards; animation-delay: 1.0s;
+      border-radius: var(--radius-md); overflow: hidden;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.04), 0 8px 24px rgba(0,0,0,0.08), 0 32px 80px rgba(0,0,0,0.12);
+      border: 1px solid rgba(0,0,0,0.08);
+    }
+
+    /* Dark UI Mockup */
+    .ui { background: #0F0F0E; font-family: var(--font-sans); font-size: 12px; color: #D4D4D0; }
+    .ui-tabs {
+      display: flex; align-items: center; gap: 0;
+      padding: 0 20px; border-bottom: 1px solid rgba(255,255,255,0.07);
+      background: #111110;
+    }
+    .ui-tab {
+      padding: 11px 14px; font-size: 12px; font-weight: 500;
+      color: rgba(255,255,255,0.35); cursor: pointer; position: relative;
+    }
+    .ui-tab.active { color: #E8E8E4; }
+    .ui-tab.active::after {
+      content: ''; position: absolute; bottom: -1px; left: 0; right: 0;
+      height: 2px; background: var(--color-accent);
+      border-radius: 2px 2px 0 0;
+    }
+    .ui-tab-new { padding: 11px 14px; font-size: 12px; color: rgba(255,255,255,0.22); }
+    .ui-toolbar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 9px 20px; border-bottom: 1px solid rgba(255,255,255,0.06);
+      background: #111110;
+    }
+    .ui-toolbar-l { display: flex; align-items: center; gap: 7px; }
+    .ui-search {
+      display: flex; align-items: center; gap: 5px;
+      background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 5px; padding: 4px 9px;
+      color: rgba(255,255,255,0.25); font-size: 11px; width: 160px;
+    }
+    .ui-filter {
+      display: flex; align-items: center; gap: 4px;
+      background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 5px; padding: 4px 9px;
+      color: rgba(255,255,255,0.4); font-size: 11px; cursor: pointer;
+    }
+    .ui-toolbar-r { display: flex; align-items: center; gap: 10px; font-size: 11px; color: rgba(255,255,255,0.3); }
+    .ui-table { width: 100%; border-collapse: collapse; }
+    .ui-th {
+      padding: 7px 12px; font-size: 11px; font-weight: 500;
+      color: rgba(255,255,255,0.3); text-align: left;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      white-space: nowrap; background: #111110;
+    }
+    .ui-th-icon { display: inline-flex; align-items: center; gap: 4px; }
+    .ui-row { border-bottom: 1px solid rgba(255,255,255,0.04); transition: background 0.12s; }
+    .ui-row:hover { background: rgba(255,255,255,0.025); }
+    .ui-td {
+      padding: 9px 12px; font-size: 11px; vertical-align: middle;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 160px;
+    }
+    .ui-acct { display: flex; align-items: center; gap: 8px; }
+    .ui-logo {
+      width: 22px; height: 22px; border-radius: 5px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 9px; font-weight: 700; flex-shrink: 0; color: white;
+    }
+    .ui-name { font-weight: 500; color: #E8E8E4; font-size: 12px; }
+    .ui-arr { font-weight: 500; color: #C8C8C4; }
+    .ui-sigs { display: flex; flex-wrap: wrap; gap: 3px; max-width: 260px; }
+    .sig {
+      font-size: 9.5px; font-weight: 500; padding: 2px 6px;
+      border-radius: 100px; white-space: nowrap;
+    }
+    .sig.g { background: rgba(74,222,128,0.12); color: #4ADE80; }
+    .sig.r { background: rgba(248,113,113,0.14); color: #F87171; }
+    .sig.y { background: rgba(252,211,77,0.12); color: #FCD34D; }
+    .ui-status {
+      display: inline-flex; align-items: center; gap: 3px;
+      font-size: 9px; font-weight: 700; letter-spacing: 0.04em;
+      padding: 2px 6px; border-radius: 4px; margin-right: 4px;
+    }
+    .ui-status.ok { background: rgba(74,222,128,0.12); color: #4ADE80; }
+    .ui-status.crit { background: rgba(248,113,113,0.16); color: #F87171; }
+    .ui-status.warn { background: rgba(252,211,77,0.12); color: #FCD34D; }
+    .ui-sum { color: rgba(255,255,255,0.42); font-size: 11px; }
+    .ui-mtg-name { color: rgba(255,255,255,0.65); display: block; font-size: 11px; }
+    .ui-mtg-date { color: rgba(255,255,255,0.25); display: block; font-size: 10px; }
+    .ui-txt { color: rgba(255,255,255,0.38); font-size: 11px; }
+    .ui-dash { color: rgba(255,255,255,0.18); }
+    .ui-chk { width: 12px; height: 12px; border: 1px solid rgba(255,255,255,0.15); border-radius: 3px; }
+
+    /* ══════════════════════════════════════════
+       § 2 — PROBLEM + PROMISE (merged)
+    ══════════════════════════════════════════ */
+    .section-pp { padding: var(--section-padding); }
+    .pp-inner { max-width: var(--max-width); margin: 0 auto; padding: 0 48px; }
+    .promise-block {
+      max-width: 640px; margin: 0 auto 80px; text-align: center;
+    }
+    .promise-p {
+      font-family: var(--font-sans);
+      font-size: 22px; font-weight: 400;
+      line-height: 1.65; color: var(--color-text);
+    }
+    .promise-p + .promise-p { margin-top: 18px; color: var(--color-text-muted); }
+
+    /* ── SINGLE-DAY SPLIT ── */
+    .day-compare {
+      max-width: 640px; margin: 0 auto 64px;
+      display: grid; grid-template-columns: 1fr 40px 1fr;
+      align-items: start; gap: 0;
+    }
+    .day-panel-head {
+      font-size: 11px; font-weight: 600; letter-spacing: 0.05em;
+      text-transform: uppercase; color: var(--color-text-muted);
+      margin-bottom: 12px; display: flex; align-items: center; gap: 7px;
+    }
+    .dp-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+    .day-slots { display: flex; flex-direction: column; gap: 4px; }
+    .ds {
+      padding: 8px 10px; border-radius: 5px;
+      font-size: 12px; font-weight: 500; line-height: 1.3;
+      border-left: 2px solid transparent;
+    }
+    .ds.admin { background: #EDECEA; color: #9B9998; border-left-color: #C8C6C0; }
+    .ds.customer { background: rgba(232,96,60,0.1); color: var(--color-accent); border-left-color: var(--color-accent); }
+    .ds.strategic { background: rgba(22,163,74,0.08); color: #16A34A; border-left-color: #16A34A; }
+    .ds.focus { background: rgba(59,130,246,0.07); color: #3B82F6; border-left-color: #3B82F6; }
+    .ds.lunch { background: transparent; color: #C8C6C0; font-size: 10px; text-align: center; border-left: none; letter-spacing: 0.04em; }
+    .day-arrow-col {
+      display: flex; align-items: flex-start; justify-content: center;
+      padding-top: 38px; font-size: 18px; color: var(--color-text-muted);
+    }
+    .day-stat {
+      margin-top: 10px; font-size: 12px; font-weight: 600; letter-spacing: 0.01em;
+    }
+    .day-stat.muted { color: var(--color-text-muted); }
+    .day-stat.accent { color: var(--color-accent); }
+
+    /* Problem cards under time visual */
+    .problem-row {
+      display: flex; align-items: flex-start; justify-content: space-between;
+      gap: 40px; margin-bottom: 40px;
+    }
+    .problem-hed {
+      font-family: var(--font-sans);
+      font-size: clamp(24px, 2.8vw, 36px); font-weight: 500;
+      line-height: 1.2; letter-spacing: -0.02em;
+      flex: 0 0 auto; max-width: 340px;
+    }
+    .problem-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; flex: 1; }
+    .pain-card { background: var(--color-bg-muted); border-radius: var(--radius-md); padding: 22px 20px; }
+    .pain-num { font-size: 11px; font-weight: 600; color: var(--color-accent); margin-bottom: 8px; letter-spacing: 0.04em; }
+    .pain-title { font-size: 15px; font-weight: 600; margin-bottom: 8px; line-height: 1.3; }
+    .pain-body { font-size: 13px; color: var(--color-text-muted); line-height: 1.6; }
+    .problem-closing {
+      text-align: center; font-family: var(--font-display);
+      font-size: 20px; font-weight: 400; font-style: italic;
+      color: var(--color-text-muted);
+    }
+
+    /* ══════════════════════════════════════════
+       § 3 — HOW IT WORKS (chaos → clarity)
+    ══════════════════════════════════════════ */
+    .chaos-wrapper { height: 300vh; position: relative; }
+    .chaos-sticky {
+      position: sticky; top: 0; height: 100vh;
+      background: var(--color-bg-dark);
+      overflow: hidden; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 0;
+    }
+    /* Step indicators */
+    .chaos-steps {
+      display: flex; align-items: center; gap: 4px;
+      margin-bottom: 28px; z-index: 3; position: relative;
+    }
+    .cstep {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 11px; font-weight: 500;
+      color: rgba(255,255,255,0.28); transition: color 0.5s;
+    }
+    .cstep.active { color: rgba(255,255,255,0.88); }
+    .cstep-num {
+      width: 18px; height: 18px; border-radius: 50%;
+      border: 1px solid rgba(255,255,255,0.18);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 9px; font-weight: 700;
+      transition: background 0.5s, border-color 0.5s, color 0.5s;
+    }
+    .cstep.active .cstep-num { background: var(--color-accent); border-color: var(--color-accent); color: white; }
+    .cstep-arrow { color: rgba(255,255,255,0.15); font-size: 10px; margin: 0 4px; }
+
+    .chaos-headline-wrap {
+      text-align: center; margin-bottom: 32px;
+      z-index: 2; position: relative; min-height: 54px;
+    }
+    .chaos-headline {
+      font-family: var(--font-sans);
+      font-size: clamp(26px, 3.2vw, 40px); font-weight: 500;
+      line-height: 1.2; letter-spacing: -0.02em;
+      color: white; transition: opacity 0.3s ease;
+    }
+
+    /* Floating tool cards */
+    .chaos-stage-area {
+      position: relative; width: 100%; max-width: 680px;
+      height: 340px; z-index: 1;
+    }
+    .tool-card {
+      position: absolute;
+      background: #1C1C1A; border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 10px; padding: 9px 13px;
+      font-size: 11.5px; font-weight: 600; color: #E0E0DC;
+      display: flex; align-items: center; gap: 8px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+      transition: transform 0.85s cubic-bezier(0.25,0.46,0.45,0.94),
+                  opacity 0.85s ease,
+                  left 0.85s cubic-bezier(0.25,0.46,0.45,0.94),
+                  top 0.85s cubic-bezier(0.25,0.46,0.45,0.94),
+                  filter 0.6s ease;
+      white-space: nowrap; user-select: none;
+    }
+    .tool-icon {
+      width: 22px; height: 22px; border-radius: 5px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .tool-icon svg { width: 13px; height: 13px; }
+    .missed-dot {
+      position: absolute; top: -3px; right: -3px;
+      width: 7px; height: 7px; border-radius: 50%;
+      background: #EF4444; animation: pdot 1.5s infinite;
+    }
+    @keyframes pdot {
+      0%,100% { opacity:1; transform:scale(1); }
+      50% { opacity:0.5; transform:scale(1.4); }
+    }
+
+    /* Bonovo result card */
+    .bonovo-result {
+      position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%,-50%);
+      background: #131312; border: 1px solid rgba(255,255,255,0.1);
+      border-radius: var(--radius-md); padding: 20px;
+      width: 340px; box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+      opacity: 0; transition: opacity 0.6s ease;
+    }
+    .bonovo-result.visible { opacity: 1; }
+    .br-header {
+      font-size: 11px; font-weight: 600; color: #E0E0DC;
+      margin-bottom: 12px; display: flex; align-items: center; gap: 6px;
+    }
+    .br-header .bd { width: 7px; height: 7px; border-radius: 50%; background: var(--color-accent); }
+    .br-rows { display: flex; flex-direction: column; gap: 5px; }
+    .br-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 7px 9px; border-radius: 5px;
+      background: rgba(255,255,255,0.04); font-size: 11px;
+    }
+    .br-row.act { background: rgba(232,96,60,0.1); border: 1px solid rgba(232,96,60,0.2); }
+    .br-l { display: flex; align-items: center; gap: 7px; font-weight: 500; color: #E0E0DC; }
+    .br-r { font-size: 10px; color: rgba(255,255,255,0.35); }
+    .br-act { font-size: 10px; font-weight: 600; color: var(--color-accent); }
+    .bh { width: 6px; height: 6px; border-radius: 50%; }
+    .bh.g { background: #4ADE80; } .bh.a { background: #FCD34D; } .bh.r { background: #F87171; }
+
+    .chaos-pills {
+      display: flex; gap: 8px; margin-top: 28px;
+      position: relative; z-index: 2; flex-wrap: wrap; justify-content: center;
+    }
+    .cpill {
+      background: rgba(232,96,60,0.12); color: var(--color-accent);
+      border: 1px solid rgba(232,96,60,0.25);
+      font-size: 12px; font-weight: 500; padding: 5px 13px; border-radius: 100px;
+    }
+
+    /* ══════════════════════════════════════════
+       § 4 — SEE / KNOW / ACT / AUTOMATE
+    ══════════════════════════════════════════ */
+    .section-product { padding: var(--section-padding); }
+    .section-label { display: inline-block; margin-bottom: 14px; }
+    .section-headline {
+      font-family: var(--font-sans);
+      font-size: clamp(26px, 3.2vw, 40px); font-weight: 500;
+      line-height: 1.2; letter-spacing: -0.02em;
+    }
+    .product-panels {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 1px; background: var(--color-border);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md); overflow: hidden;
+      margin-top: 52px;
+    }
+    .pp-panel {
+      background: var(--color-bg); padding: 28px 24px;
+      border-top: 3px solid var(--color-accent);
+    }
+    .pp-tag {
+      font-size: 10px; font-weight: 700; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--color-accent);
+      margin-bottom: 12px; display: block;
+    }
+    .pp-subhead { font-size: 16px; font-weight: 600; line-height: 1.3; margin-bottom: 10px; }
+    .pp-body { font-size: 13px; color: var(--color-text-muted); line-height: 1.65; margin-bottom: 18px; }
+    .pp-bullets { list-style: none; display: flex; flex-direction: column; gap: 7px; }
+    .pp-bullets li {
+      font-size: 12.5px; color: var(--color-text-muted);
+      padding-left: 13px; position: relative; line-height: 1.5;
+    }
+    .pp-bullets li::before {
+      content: ''; position: absolute; left: 0; top: 7px;
+      width: 4px; height: 4px; border-radius: 50%; background: var(--color-accent);
+    }
+
+    /* ══════════════════════════════════════════
+       § 5 — WORKFLOW TILES
+    ══════════════════════════════════════════ */
+    .section-journey { padding: var(--section-padding); background: var(--color-bg-muted); }
+    .tiles-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 16px; margin-top: 52px;
+    }
+    .tile {
+      background: var(--color-bg); border: 1px solid var(--color-border);
+      border-radius: var(--radius-md); padding: 28px 24px;
+    }
+    .tile-icon {
+      width: 32px; height: 32px; background: var(--color-accent-light);
+      border-radius: 8px; display: flex; align-items: center; justify-content: center;
+      margin-bottom: 18px;
+    }
+    .tile-name {
+      font-size: 16px; font-weight: 600; margin-bottom: 8px;
+      color: var(--color-text); letter-spacing: -0.01em;
+    }
+    .tile-body { font-size: 14px; color: var(--color-text-muted); line-height: 1.65; }
+    @media (max-width: 1100px) { .tiles-grid { grid-template-columns: repeat(2, 1fr); } }
+    .journey-timeline { margin-top: 60px; }
+    .journey-line-row {
+      position: relative; display: flex;
+      justify-content: space-between; align-items: flex-end;
+      padding-bottom: 26px;
+    }
+    .journey-track {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      height: 1px; background: var(--color-border);
+    }
+    .jstage {
+      position: relative; flex: 1; text-align: center; cursor: pointer;
+    }
+    .jstage-label {
+      font-size: 14px; font-weight: 500;
+      color: rgba(26,26,24,0.28);
+      transition: all 0.3s ease; display: block;
+      padding-bottom: 20px; user-select: none; letter-spacing: -0.01em;
+    }
+    .jstage:hover .jstage-label { color: rgba(26,26,24,0.6); }
+    .jstage.active .jstage-label { color: var(--color-text); font-size: 16px; font-weight: 600; }
+    .jstage-dot {
+      position: absolute; bottom: -5px; left: 50%;
+      transform: translateX(-50%);
+      width: 11px; height: 11px; border-radius: 50%;
+      background: var(--color-border);
+      border: 2px solid var(--color-bg-muted);
+      transition: all 0.3s ease;
+    }
+    .jstage.active .jstage-dot {
+      width: 15px; height: 15px; bottom: -7px;
+      background: var(--color-accent);
+      border-color: var(--color-bg-muted);
+      box-shadow: 0 0 0 5px rgba(232,96,60,0.14);
+    }
+    .journey-cards { margin-top: 40px; }
+    .jcard {
+      display: none;
+      background: white; border: 1px solid var(--color-border);
+      border-radius: var(--radius-md); padding: 36px 40px;
+    }
+    .jcard.active { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 48px; align-items: center; }
+    .jcard-hed {
+      font-family: var(--font-display);
+      font-size: 26px; font-weight: 400;
+      line-height: 1.3; letter-spacing: -0.01em; margin-bottom: 14px;
+    }
+    .jcard-body { font-size: 15px; color: var(--color-text-muted); line-height: 1.7; }
+    .jcard-bullets { list-style: none; display: flex; flex-direction: column; gap: 9px; margin-top: 20px; }
+    .jcard-bullets li {
+      font-size: 14px; color: var(--color-text-muted);
+      padding-left: 16px; position: relative; line-height: 1.5;
+    }
+    .jcard-bullets li::before {
+      content: ''; position: absolute; left: 0; top: 8px;
+      width: 5px; height: 5px; border-radius: 50%; background: var(--color-accent);
+    }
+    .jcard-visual {
+      background: var(--color-bg);
+      border-radius: var(--radius-md);
+      padding: 24px; min-height: 180px;
+      border: 1px solid var(--color-border);
+      display: flex; flex-direction: column; gap: 10px; justify-content: center;
+    }
+    .jcard-metric { display: flex; align-items: center; justify-content: space-between; }
+    .jcard-metric-label { font-size: 12px; color: var(--color-text-muted); }
+    .jcard-metric-val { font-size: 13px; font-weight: 600; color: var(--color-text); }
+    .jcard-metric-val.accent { color: var(--color-accent); }
+    .jcard-bar-track { height: 5px; background: var(--color-border); border-radius: 100px; margin-top: 4px; }
+    .jcard-bar-fill { height: 100%; border-radius: 100px; background: var(--color-accent); opacity: 0.65; }
+
+    /* ══════════════════════════════════════════
+       § 6 — COMPETITIVE TABLE
+    ══════════════════════════════════════════ */
+    .section-table { padding: var(--section-padding); }
+    .table-wrap { max-width: 920px; margin: 52px auto 0; overflow-x: auto; }
+    .ctable { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .ctable th {
+      padding: 13px 14px; text-align: center;
+      font-size: 12px; font-weight: 600; color: #8B8B88;
+      border-bottom: 1px solid var(--color-border);
+    }
+    .ctable th.bh { background: var(--color-accent); color: white; border-radius: var(--radius-sm) var(--radius-sm) 0 0; font-size: 13px; }
+    .ctable th:first-child { text-align: left; }
+    .ctable td {
+      padding: 13px 14px; text-align: center;
+      border-bottom: 1px solid var(--color-border);
+      color: #9B9B98; transition: background 0.15s;
+    }
+    .ctable td:first-child { text-align: left; font-weight: 500; color: var(--color-text); font-size: 14px; }
+    .ctable td.bc { background: var(--color-accent-light); font-weight: 700; color: var(--color-accent); }
+    .ctable tr:hover td { background: var(--color-bg-muted); }
+    .ctable tr:hover td.bc { background: #fae8e2; }
+
+    /* ══════════════════════════════════════════
+       § 7 — INTEGRATIONS TICKER
+    ══════════════════════════════════════════ */
+    .section-integrations { padding: var(--section-padding); background: var(--color-bg-muted); overflow: hidden; }
+    .int-header { text-align: center; margin-bottom: 10px; }
+    .int-subline { text-align: center; color: var(--color-text-muted); font-size: 15px; margin-bottom: 48px; }
+    .ticker-wrap { overflow: hidden; position: relative; margin: 0 -48px; }
+    .ticker-wrap::before, .ticker-wrap::after {
+      content: ''; position: absolute; top: 0; bottom: 0; width: 100px;
+      z-index: 2; pointer-events: none;
+    }
+    .ticker-wrap::before { left: 0; background: linear-gradient(to right, var(--color-bg-muted), transparent); }
+    .ticker-wrap::after { right: 0; background: linear-gradient(to left, var(--color-bg-muted), transparent); }
+    .ticker-row { display: flex; gap: 10px; margin-bottom: 9px; width: max-content; }
+    .ticker-row.r1 { animation: tltr 30s linear infinite; }
+    .ticker-row.r2 { animation: trtl 30s linear infinite; }
+    .ticker-row:hover { animation-play-state: paused; }
+    @keyframes tltr { 0% { transform:translateX(0); } 100% { transform:translateX(-50%); } }
+    @keyframes trtl { 0% { transform:translateX(-50%); } 100% { transform:translateX(0); } }
+    .logo-chip {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: white; border: 1px solid var(--color-border);
+      border-radius: 100px; padding: 7px 15px;
+      font-size: 12px; font-weight: 500; color: var(--color-text); white-space: nowrap;
+    }
+    .lcdot { width: 7px; height: 7px; border-radius: 50%; }
+
+
+    /* ══════════════════════════════════════════
+       § 9 — FAQ
+    ══════════════════════════════════════════ */
+    .section-faq { padding: var(--section-padding); background: var(--color-bg-muted); }
+    .faq-list { max-width: 700px; margin: 52px auto 0; }
+    .faq-item { border-bottom: 1px solid var(--color-border); }
+    .faq-q {
+      display: flex; align-items: center; justify-content: space-between;
+      width: 100%; padding: 20px 0; background: none; border: none;
+      cursor: pointer; text-align: left;
+      font-family: var(--font-sans); font-size: 16px; font-weight: 500;
+      color: var(--color-text); gap: 16px; transition: color 0.2s;
+    }
+    .faq-q:hover { color: var(--color-accent); }
+    .faq-ico {
+      flex-shrink: 0; width: 20px; height: 20px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; color: var(--color-text-muted);
+      transition: transform 0.3s, color 0.2s;
+    }
+    .faq-ans { overflow: hidden; max-height: 0; transition: max-height 0.4s ease; }
+    .faq-ans.open { max-height: 400px; }
+    .faq-ans-inner {
+      padding: 0 0 20px 18px;
+      font-size: 15px; color: var(--color-text-muted); line-height: 1.7;
+      border-left: 2px solid var(--color-accent);
+    }
+    .faq-item.active .faq-ico { transform: rotate(45deg); color: var(--color-accent); }
+
+    /* ══════════════════════════════════════════
+       § 10 — CTA + FOOTER
+    ══════════════════════════════════════════ */
+    .section-cta { background: var(--color-bg-dark); padding: 112px 48px; text-align: center; }
+    .cta-hed {
+      font-family: var(--font-sans);
+      font-size: clamp(30px, 3.8vw, 48px); font-weight: 500;
+      line-height: 1.15; letter-spacing: -0.02em;
+      color: white; margin-bottom: 44px;
+      max-width: 580px; margin-left: auto; margin-right: auto;
+    }
+    .cta-acts { display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap; }
+    .footer { background: var(--color-bg-muted); padding: 60px 48px 28px; }
+    .footer-inner { max-width: var(--max-width); margin: 0 auto; }
+    .footer-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 48px; gap: 40px; }
+    .footer-brand { flex: 1; }
+    .footer-logo { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+    .footer-mark {
+      width: 22px; height: 22px; background: var(--color-accent);
+      border-radius: 6px; display: flex; align-items: center; justify-content: center;
+    }
+    .footer-wordmark { font-family: var(--font-sans); font-size: 16px; font-weight: 600; color: var(--color-text); letter-spacing: -0.01em; }
+    .footer-tagline { font-size: 13px; color: var(--color-text-muted); }
+    .footer-links { display: flex; gap: 28px; }
+    .footer-links a { font-size: 14px; font-weight: 500; color: var(--color-text-muted); text-decoration: none; transition: color 0.2s; }
+    .footer-links a:hover { color: var(--color-text); }
+    .footer-bottom { border-top: 1px solid var(--color-border); padding-top: 22px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+    .footer-copy { font-size: 12px; color: var(--color-text-muted); }
+    .footer-legal { display: flex; gap: 18px; }
+    .footer-legal a { font-size: 12px; color: var(--color-text-muted); text-decoration: none; }
+    .footer-legal a:hover { color: var(--color-text); }
+
+    @keyframes fadeUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+
+    /* ══ RESPONSIVE ══ */
+    @media (max-width: 1100px) {
+      .product-panels { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 768px) {
+      :root { --section-padding: 72px 24px; }
+      .nav, .hero, .container, .pp-inner, .section-cta, .footer { padding-left: 24px; padding-right: 24px; }
+      .hero { padding: 110px 24px 56px; }
+      .hero-ui-wrap { display: none; }
+      .cal-compare { grid-template-columns: 1fr; }
+      .cal-arrow-col { display: none; }
+      .problem-row { flex-direction: column; gap: 24px; }
+      .problem-cards { grid-template-columns: 1fr; }
+      .product-panels { grid-template-columns: 1fr; }
+      .jcard.active { grid-template-columns: 1fr; }
+      .market-stats { flex-direction: column; gap: 28px; }
+      .footer-top { flex-direction: column; }
+      .footer-links { flex-wrap: wrap; gap: 18px; }
+      .nav-signin { display: none; }
+      .ticker-wrap { margin: 0 -24px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      * { animation: none !important; transition: none !important; }
+      .reveal { opacity: 1; transform: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════ NAV ═══════ -->
+<nav class="nav" id="nav" aria-label="Main navigation">
+  <a href="#" class="nav-logo">
+    <div class="nav-mark" aria-hidden="true">
+      <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="6" cy="13.5" r="2.4" fill="white"/>
+        <circle cx="14.5" cy="6.5" r="3.2" fill="white" opacity="0.88"/>
+        <path d="M8.1 11.9 C9.8 9.8 11.8 8 11.7 7.8" stroke="white" stroke-width="1.6" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <span class="nav-wordmark">Bonovo</span>
+  </a>
+  <div class="nav-actions">
+    <a href="#" class="nav-signin">Sign in</a>
+    <a href="#" class="btn btn-primary">Book a demo</a>
+  </div>
+</nav>
+
+<!-- ═══════ § 1 — HERO ═══════ -->
+<section class="hero" aria-labelledby="hero-hed">
+  <div class="hero-inner">
+    <p class="hero-label label" style="color:var(--color-accent); margin-bottom:20px; opacity:0; animation:fadeUp 0.6s ease forwards; animation-delay:0.1s;">Customer Success, reimagined</p>
+    <h1 class="hero-headline" id="hero-hed">
+      <span class="line">No more tab switching.</span>
+      <span class="line" style="animation-delay:0.36s">Your accounts, your signals,</span>
+      <span class="line" style="animation-delay:0.52s">your next move — all in one place.</span>
+    </h1>
+    <div class="hero-actions">
+      <a href="#" class="btn btn-primary">See it in 5 minutes</a>
+      <a href="#" class="btn btn-secondary">Book a demo</a>
+    </div>
+
+    <!-- Dark dashboard UI mockup -->
+    <div class="hero-ui-wrap" aria-hidden="true">
+      <div class="ui">
+        <!-- Tabs -->
+        <div class="ui-tabs">
+          <div class="ui-tab active">All Accounts</div>
+          <div class="ui-tab-new">+ New View</div>
+        </div>
+        <!-- Toolbar -->
+        <div class="ui-toolbar">
+          <div class="ui-toolbar-l">
+            <div class="ui-search">
+              <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><circle cx="4" cy="4" r="3" stroke="currentColor" stroke-width="1.2"/><path d="M7 7l1.5 1.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+              Find Account...
+            </div>
+            <div class="ui-filter">
+              <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M1 3h8M3 6h4M4.5 9h1" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+              Filter
+            </div>
+          </div>
+          <div class="ui-toolbar-r">
+            <span>+ Add column</span>
+            <span style="opacity:0.4">|</span>
+            <span>Manage View</span>
+          </div>
+        </div>
+        <!-- Table -->
+        <table class="ui-table">
+          <thead>
+            <tr>
+              <th class="ui-th" style="width:32px"><div class="ui-chk"></div></th>
+              <th class="ui-th" style="min-width:160px"><div class="ui-th-icon">
+                <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><rect x="1" y="1" width="8" height="8" rx="1.5" stroke="currentColor" stroke-width="1.2"/></svg>Account
+              </div></th>
+              <th class="ui-th"><div class="ui-th-icon">
+                <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><rect x="1" y="1" width="8" height="8" rx="1.5" stroke="currentColor" stroke-width="1.2"/></svg>ARR ▾
+              </div></th>
+              <th class="ui-th" style="min-width:240px"><div class="ui-th-icon">
+                <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><circle cx="5" cy="5" r="3.5" stroke="#E8603C" stroke-width="1.2"/></svg>Signals
+              </div></th>
+              <th class="ui-th" style="min-width:140px">Account Summary</th>
+              <th class="ui-th" style="min-width:130px"><div class="ui-th-icon">
+                <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><rect x="1" y="1" width="8" height="8" rx="1.5" stroke="#FCD34D" stroke-width="1.2"/></svg>Last Meeting
+              </div></th>
+              <th class="ui-th" style="min-width:130px"><div class="ui-th-icon">
+                <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><rect x="1" y="1" width="8" height="8" rx="1.5" stroke="#FCD34D" stroke-width="1.2"/></svg>Upcoming Meeting
+              </div></th>
+              <th class="ui-th" style="min-width:140px"><div class="ui-th-icon">
+                <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><rect x="1" y="2" width="8" height="7" rx="1" stroke="#F87171" stroke-width="1.2"/><path d="M3 2V1M7 2V1" stroke="#F87171" stroke-width="1.2" stroke-linecap="round"/></svg>Email Feedback
+              </div></th>
+              <th class="ui-th" style="min-width:130px">Last Slack</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="ui-row">
+              <td class="ui-td"><div class="ui-chk"></div></td>
+              <td class="ui-td"><div class="ui-acct"><div class="ui-logo" style="background:#111"><svg viewBox="0 0 20 20" fill="white" width="14" height="14"><path d="M10 2C5.58 2 2 5.58 2 10s3.58 8 8 8 8-3.58 8-8-3.58-8-8-8zm3.64 12.36L9 10.41V5h1.5v4.59l4.14 4.14-1 1.13z"/></svg></div><span class="ui-name">Apple</span></div></td>
+              <td class="ui-td ui-arr">$580K</td>
+              <td class="ui-td"><div class="ui-sigs"><span class="sig g">All-Time High Usage</span><span class="sig g">NPS of 86</span><span class="sig g">Services Division Expansion</span></div></td>
+              <td class="ui-td"><span class="ui-status ok">OK</span><span class="ui-sum">Flagship $580K ARR account. Usage at all-time...</span></td>
+              <td class="ui-td"><span class="ui-mtg-name">Apple — Quarterly...</span><span class="ui-mtg-date">Mar 20, 2:00 PM</span></td>
+              <td class="ui-td"><span class="ui-mtg-name">Apple — AI Features Early...</span><span class="ui-mtg-date">Apr 9, 2:00 PM</span></td>
+              <td class="ui-td"><span class="ui-txt">Lisa sent an unsolicited note praising the...</span></td>
+              <td class="ui-td"><span class="ui-txt">The team absolutely loves the automation...</span></td>
+            </tr>
+            <tr class="ui-row">
+              <td class="ui-td"><div class="ui-chk"></div></td>
+              <td class="ui-td"><div class="ui-acct"><div class="ui-logo" style="background:#4285F4">G</div><span class="ui-name">Alphabet</span></div></td>
+              <td class="ui-td ui-arr">$450K</td>
+              <td class="ui-td"><div class="ui-sigs"><span class="sig g">Google Cloud Expansion</span><span class="sig g">Waymo Team Interest</span><span class="sig g">Annual QBR Completed</span></div></td>
+              <td class="ui-td"><span class="ui-status ok">OK</span><span class="ui-sum">Flagship $450K ARR account. Usage consistent...</span></td>
+              <td class="ui-td"><span class="ui-mtg-name">Alphabet — Annual...</span><span class="ui-mtg-date">Mar 5, 10:00 AM</span></td>
+              <td class="ui-td"><span class="ui-mtg-name">Alphabet — Waymo...</span><span class="ui-mtg-date">Apr 10, 9:00 AM</span></td>
+              <td class="ui-td"><span class="ui-txt">Sundar's team responded positively to the annual...</span></td>
+              <td class="ui-td"><span class="ui-txt">The Waymo team leads are excited to get...</span></td>
+            </tr>
+            <tr class="ui-row">
+              <td class="ui-td"><div class="ui-chk"></div></td>
+              <td class="ui-td"><div class="ui-acct"><div class="ui-logo" style="background:#000">U</div><span class="ui-name">Uber</span></div></td>
+              <td class="ui-td ui-arr">$240K</td>
+              <td class="ui-td"><div class="ui-sigs"><span class="sig g">Expansion Opportunity</span><span class="sig g">New VP Champion</span><span class="sig g">Usage Up 14% QoQ</span></div></td>
+              <td class="ui-td"><span class="ui-status ok">OK</span><span class="ui-sum">Strong account at $240K ARR. Usage up 14% QoQ...</span></td>
+              <td class="ui-td"><span class="ui-mtg-name">Uber — Expansion...</span><span class="ui-mtg-date">Mar 19, 2:00 PM</span></td>
+              <td class="ui-td"><span class="ui-mtg-name">Uber — Multi-Division...</span><span class="ui-mtg-date">Apr 3, 3:00 PM</span></td>
+              <td class="ui-td"><span class="ui-txt">Jennifer responded positively to the expansio...</span></td>
+              <td class="ui-td"><span class="ui-txt">Just shared the multi-division rollout deck...</span></td>
+            </tr>
+            <tr class="ui-row">
+              <td class="ui-td"><div class="ui-chk"></div></td>
+              <td class="ui-td"><div class="ui-acct"><div class="ui-logo" style="background:#10A37F">◆</div><span class="ui-name">OpenAI</span></div></td>
+              <td class="ui-td ui-arr">$200K</td>
+              <td class="ui-td"><div class="ui-sigs"><span class="sig r">Renewal in 12 Days</span><span class="sig r">Usage Down 41%</span><span class="sig r">Exec Sponsor Changed</span><span class="sig r">No QBR Completed</span></div></td>
+              <td class="ui-td"><span class="ui-status crit">CRITICAL</span><span class="ui-sum">$200K ARR renewal in 12 days. Executive...</span></td>
+              <td class="ui-td"><span class="ui-mtg-name">OpenAI — Emergency...</span><span class="ui-mtg-date">Mar 22, 9:00 AM</span></td>
+              <td class="ui-td"><span class="ui-dash">—</span></td>
+              <td class="ui-td"><span class="ui-txt">CRITICAL — Liam's last email flagged...</span></td>
+              <td class="ui-td"><span class="ui-txt">We need a decision by EOW on whether to...</span></td>
+            </tr>
+            <tr class="ui-row">
+              <td class="ui-td"><div class="ui-chk"></div></td>
+              <td class="ui-td"><div class="ui-acct"><div class="ui-logo" style="background:#0A66C2">in</div><span class="ui-name">LinkedIn</span></div></td>
+              <td class="ui-td ui-arr">$180K</td>
+              <td class="ui-td"><div class="ui-sigs"><span class="sig y">Exec Sponsor Reorg</span><span class="sig y">Competitor in Evaluation</span><span class="sig y">Budget Freeze Signal</span><span class="sig y">Prior Champion Available</span></div></td>
+              <td class="ui-td"><span class="ui-status warn">WARN</span><span class="ui-sum">Executive sponsor reorganized into new...</span></td>
+              <td class="ui-td"><span class="ui-mtg-name">LinkedIn — Renewal...</span><span class="ui-mtg-date">Mar 14, 4:00 PM</span></td>
+              <td class="ui-td"><span class="ui-mtg-name">LinkedIn — Executive...</span><span class="ui-mtg-date">Apr 4, 2:00 PM</span></td>
+              <td class="ui-td"><span class="ui-txt">Aisha's tone has shifted — shorter replies, slower...</span></td>
+              <td class="ui-td"><span class="ui-txt">We'll have a decision for you after the EBR...</span></td>
+            </tr>
+            <tr class="ui-row">
+              <td class="ui-td"><div class="ui-chk"></div></td>
+              <td class="ui-td"><div class="ui-acct"><div class="ui-logo" style="background:#29B5E8">❄</div><span class="ui-name">Snowflake</span></div></td>
+              <td class="ui-td ui-arr">$140K</td>
+              <td class="ui-td"><div class="ui-sigs"><span class="sig g">Warehouse Integration Interest</span><span class="sig g">Data Team Expansion</span><span class="sig g">Steady 83% Usage</span></div></td>
+              <td class="ui-td"><span class="ui-status ok">OK</span><span class="ui-sum">$140K ARR. Deeply integrated platform across...</span></td>
+              <td class="ui-td"><span class="ui-mtg-name">Snowflake — Technical...</span><span class="ui-mtg-date">Mar 23, 11:00 AM</span></td>
+              <td class="ui-td"><span class="ui-mtg-name">Snowflake — Warehouse...</span><span class="ui-mtg-date">Apr 6, 10:00 AM</span></td>
+              <td class="ui-td"><span class="ui-txt">Christian sent detailed technical requirements fo...</span></td>
+              <td class="ui-td"><span class="ui-txt">Our data team is really interested in the...</span></td>
+            </tr>
+            <tr class="ui-row">
+              <td class="ui-td"><div class="ui-chk"></div></td>
+              <td class="ui-td"><div class="ui-acct"><div class="ui-logo" style="background:#FF3008">D</div><span class="ui-name">DoorDash</span></div></td>
+              <td class="ui-td ui-arr">$120K</td>
+              <td class="ui-td"><div class="ui-sigs"><span class="sig r">Champion Departed</span><span class="sig r">Usage Decline 22%</span><span class="sig r">No EBR Scheduled</span></div></td>
+              <td class="ui-td"><span class="ui-status warn">WARN</span><span class="ui-sum">Champion departed last month. Usage down 22...</span></td>
+              <td class="ui-td"><span class="ui-mtg-name">DoorDash — QBR Q1 2026</span><span class="ui-mtg-date">Mar 12, 11:00 AM</span></td>
+              <td class="ui-td"><span class="ui-dash">—</span></td>
+              <td class="ui-td"><span class="ui-txt">No reply to intro email to new champion (Marcus...</span></td>
+              <td class="ui-td"><span class="ui-txt">Hey — Marcus just joined from Instacart...</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ § 2 — PROBLEM + PROMISE (merged) ═══════ -->
+<section class="section-pp" aria-label="The problem and our promise">
+  <div class="pp-inner">
+    <span class="label reveal" style="display:block; margin-bottom:14px;">The problem</span>
+    <div class="promise-block">
+      <div class="reveal">
+        <p class="promise-p">CS is a people job.<br>Somewhere along the way it became a data and admin job.</p>
+      </div>
+      <div class="reveal reveal-d2">
+        <p class="promise-p">Bonovo gives your team the context, the signals, and the next move — so they can get back to the part that actually matters: relationships and strategy.</p>
+      </div>
+    </div>
+
+    <!-- Single-day split visual -->
+    <div class="day-compare reveal">
+      <div>
+        <div class="day-panel-head"><span class="dp-dot" style="background:#C8C6C0"></span>Before Bonovo · Tuesday</div>
+        <div class="day-slots">
+          <div class="ds admin">Tab switching + CRM check</div>
+          <div class="ds customer">Customer call</div>
+          <div class="ds admin">QBR prep</div>
+          <div class="ds admin">Status emails</div>
+          <div class="ds lunch">— lunch —</div>
+          <div class="ds admin">QBR prep (cont.)</div>
+          <div class="ds customer">Customer call</div>
+          <div class="ds admin">CRM update + notes</div>
+        </div>
+        <div class="day-stat muted">~20% customer time</div>
+      </div>
+      <div class="day-arrow-col">→</div>
+      <div>
+        <div class="day-panel-head"><span class="dp-dot" style="background:var(--color-accent)"></span>With Bonovo · Tuesday</div>
+        <div class="day-slots">
+          <div class="ds customer">Customer call</div>
+          <div class="ds customer">Customer call</div>
+          <div class="ds customer">Customer call</div>
+          <div class="ds strategic">Strategic review</div>
+          <div class="ds lunch">— lunch —</div>
+          <div class="ds customer">Customer call</div>
+          <div class="ds customer">Customer call</div>
+          <div class="ds focus">Focus time</div>
+        </div>
+        <div class="day-stat accent">~80% customer time</div>
+      </div>
+    </div>
+
+    <!-- Problem cards -->
+    <div class="problem-row reveal">
+      <h2 class="problem-hed">This is Cody's day.<br>He's a great CSM.<br><em>His tools don't know that.</em></h2>
+      <div class="problem-cards">
+        <div class="pain-card reveal">
+          <div class="pain-num">01</div>
+          <div class="pain-title">Seven tabs. Every account. Every time.</div>
+          <p class="pain-body">Before Cody can do anything, he has to rebuild the picture from scratch. Salesforce, Slack, Zendesk, email, HubSpot, Google Docs, a spreadsheet from 2021.</p>
+        </div>
+        <div class="pain-card reveal reveal-d1">
+          <div class="pain-num">02</div>
+          <div class="pain-title">Plenty of data. No clear signal.</div>
+          <p class="pain-body">Even when he has everything open, he can't tell what actually needs his attention today. The account at risk looks healthy. Until it isn't.</p>
+        </div>
+        <div class="pain-card reveal reveal-d2">
+          <div class="pain-num">03</div>
+          <div class="pain-title">Same tasks. Every single week.</div>
+          <p class="pain-body">QBR prep, CRM updates, status emails, meeting notes. By the time Cody gets to an actual customer conversation, half the day is gone.</p>
+        </div>
+      </div>
+    </div>
+    <p class="problem-closing reveal">The job is the relationship. Everything else is in the way.</p>
+  </div>
+</section>
+
+<!-- ═══════ § 3 — HOW IT WORKS ═══════ -->
+<div class="chaos-wrapper" id="chaos-wrapper" aria-label="How Bonovo works">
+  <div class="chaos-sticky" id="chaos-sticky">
+    <!-- Section label -->
+    <span class="label" style="color:rgba(255,255,255,0.35); margin-bottom:8px; display:block; text-align:center;">How it works</span>
+    <!-- Step indicators -->
+    <div class="chaos-steps" id="chaos-steps">
+      <div class="cstep active" data-step="0"><div class="cstep-num">1</div>Connect</div>
+      <div class="cstep-arrow">→</div>
+      <div class="cstep" data-step="1"><div class="cstep-num">2</div>See</div>
+      <div class="cstep-arrow">→</div>
+      <div class="cstep" data-step="2"><div class="cstep-num">3</div>Know</div>
+      <div class="cstep-arrow">→</div>
+      <div class="cstep" data-step="3"><div class="cstep-num">4</div>Automate</div>
+    </div>
+
+    <div class="chaos-headline-wrap">
+      <h2 class="chaos-headline" id="chaos-headline">Connect your entire stack.</h2>
+    </div>
+
+    <div class="chaos-stage-area" id="chaos-stage" aria-hidden="true">
+      <!-- Tool cards injected by JS -->
+      <div class="bonovo-result" id="bonovo-result">
+        <div class="br-header"><span class="bd"></span>Bonovo — Your portfolio, automated</div>
+        <div class="br-rows">
+          <div class="br-row act"><div class="br-l"><div class="bh r"></div>Meridian Labs</div><span class="br-act">⚡ Auto-brief sent</span></div>
+          <div class="br-row"><div class="br-l"><div class="bh a"></div>Archway Financial</div><span class="br-r">Renewal playbook triggered</span></div>
+          <div class="br-row"><div class="br-l"><div class="bh g"></div>Volta Systems</div><span class="br-r">QBR auto-populated</span></div>
+          <div class="br-row"><div class="br-l"><div class="bh g"></div>Cortex Analytics</div><span class="br-r">Expansion signal flagged</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="chaos-pills">
+      <span class="cpill">5 minute setup</span>
+      <span class="cpill">Value from day one</span>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ § 4 — SEE / KNOW / ACT / AUTOMATE ═══════ -->
+<section class="section-product" id="product" aria-labelledby="product-hed">
+  <div class="container">
+    <span class="label section-label reveal">The product</span>
+    <h2 class="section-headline reveal" id="product-hed">Built for the relationship.<br>Not the reporting.</h2>
+    <div class="product-panels">
+      <div class="pp-panel reveal">
+        <span class="pp-tag">See</span>
+        <p class="pp-body">Everything surfaced the moment you connect your CRM. Every account, health score, renewal date, open ticket, and recent Slack thread — in one view, with no setup required.</p>
+        <ul class="pp-bullets">
+          <li>Every account, health score, and renewal date — populated instantly</li>
+          <li>Open tickets, Slack messages, email threads — surfaced automatically</li>
+          <li>No manual data entry. No configuration.</li>
+        </ul>
+      </div>
+      <div class="pp-panel reveal reveal-d1">
+        <span class="pp-tag">Know</span>
+        <p class="pp-body">Bonovo tells you which accounts need attention today, what's changed since yesterday, and where churn is building — before it shows up in a renewal conversation.</p>
+        <ul class="pp-bullets">
+          <li>Which accounts dropped usage in the last 7 days</li>
+          <li>Which renewals are 60–90 days out and showing risk signals</li>
+          <li>Which champion just changed jobs — before they go quiet</li>
+        </ul>
+      </div>
+      <div class="pp-panel reveal reveal-d2">
+        <span class="pp-tag">Act</span>
+        <p class="pp-body">Pre-call briefs, QBRs, renewal workspaces, follow-ups, CRM updates — generated and sent automatically. Cody shows up to conversations, not spreadsheets.</p>
+        <ul class="pp-bullets">
+          <li>Pre-call brief generated 2 minutes before every meeting</li>
+          <li>QBR template auto-populated with usage trends and open risks</li>
+          <li>Renewal workspace built in one click — contract terms, expansion signals, next steps</li>
+          <li>Post-meeting follow-ups drafted and sent automatically</li>
+          <li>CRM activity logged from every call, email, and Slack thread</li>
+          <li>Churn playbooks triggered automatically when health score drops</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ § 5 — JOURNEY TIMELINE ═══════ -->
+<section class="section-journey" id="workflow" aria-labelledby="journey-hed">
+  <div class="container">
+    <span class="label section-label reveal">Where Bonovo helps</span>
+    <h2 class="section-headline reveal" id="journey-hed">Every stage of the customer journey.<br>Finally, covered.</h2>
+    <div class="tiles-grid">
+      <div class="tile reveal">
+        <div class="tile-icon">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="var(--color-accent)" stroke-width="1.5"/><path d="M5.5 8l2 2 3-3" stroke="var(--color-accent)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="tile-name">Onboarding</div>
+        <p class="tile-body">Get new customers to value faster, with less hand-holding from your team.</p>
+      </div>
+      <div class="tile reveal reveal-d1">
+        <div class="tile-icon">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="10" width="3" height="4" rx="1" fill="var(--color-accent)" opacity="0.4"/><rect x="6.5" y="7" width="3" height="7" rx="1" fill="var(--color-accent)" opacity="0.6"/><rect x="11" y="4" width="3" height="10" rx="1" fill="var(--color-accent)"/></svg>
+        </div>
+        <div class="tile-name">Adoption</div>
+        <p class="tile-body">See exactly where customers are stuck before they tell you.</p>
+      </div>
+      <div class="tile reveal reveal-d2">
+        <div class="tile-icon">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 9 C4 5 6 11 8 7 C10 3 12 9 14 7" stroke="var(--color-accent)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="tile-name">Health monitoring</div>
+        <p class="tile-body">Know which accounts are thriving and which are quietly at risk.</p>
+      </div>
+      <div class="tile reveal">
+        <div class="tile-icon">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2.5" y="2.5" width="11" height="11" rx="2" stroke="var(--color-accent)" stroke-width="1.5"/><path d="M5 6h6M5 9h4" stroke="var(--color-accent)" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </div>
+        <div class="tile-name">QBRs</div>
+        <p class="tile-body">Auto-populated, account-specific, ready in minutes not hours.</p>
+      </div>
+      <div class="tile reveal reveal-d1">
+        <div class="tile-icon">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M13 8A5 5 0 1 1 8 3" stroke="var(--color-accent)" stroke-width="1.5" stroke-linecap="round"/><path d="M8 3l3.5-.5L12 6" stroke="var(--color-accent)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="tile-name">Renewal</div>
+        <p class="tile-body">Flagged 60–90 days out, with everything you need to close it.</p>
+      </div>
+      <div class="tile reveal reveal-d2">
+        <div class="tile-icon">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 12 L12 4M12 4H7M12 4V9" stroke="var(--color-accent)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="tile-name">Expansion</div>
+        <p class="tile-body">Spot the upsell signal before your customer moves on.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ § 6 — COMPETITIVE TABLE ═══════ -->
+<section class="section-table" id="why-bonovo" aria-labelledby="table-hed">
+  <div class="container">
+    <span class="label section-label reveal">Why Bonovo</span>
+    <h2 class="section-headline reveal" id="table-hed">Most CS tools give you more data.<br>Bonovo gives you your next move.</h2>
+    <div class="table-wrap reveal">
+      <table class="ctable" role="table">
+        <thead>
+          <tr>
+            <th scope="col"></th>
+            <th scope="col">Spreadsheets</th>
+            <th scope="col">Gainsight</th>
+            <th scope="col">ChurnZero</th>
+            <th scope="col">Vitally</th>
+            <th scope="col" class="bh">Bonovo</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Time to first value</td>
+            <td>Manual setup</td>
+            <td>5–9 months</td>
+            <td>6–8 weeks</td>
+            <td>2–4 weeks</td>
+            <td class="bc">Today</td>
+          </tr>
+          <tr>
+            <td>No dedicated admin needed</td>
+            <td>Yes</td>
+            <td>No</td>
+            <td>No</td>
+            <td>Partial</td>
+            <td class="bc">Yes</td>
+          </tr>
+          <tr>
+            <td>AI-native platform</td>
+            <td>No</td>
+            <td>No</td>
+            <td>No</td>
+            <td>Partial</td>
+            <td class="bc">Yes</td>
+          </tr>
+          <tr>
+            <td>AI-driven insights</td>
+            <td>No</td>
+            <td>No</td>
+            <td>Partial</td>
+            <td>Partial</td>
+            <td class="bc">Yes</td>
+          </tr>
+          <tr>
+            <td>Automated CSM workflows</td>
+            <td>No</td>
+            <td>No</td>
+            <td>Partial</td>
+            <td>Partial</td>
+            <td class="bc">Yes</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ § 7 — INTEGRATIONS TICKER ═══════ -->
+<section class="section-integrations" id="integrations" aria-labelledby="int-hed">
+  <div class="int-header">
+    <span class="label reveal" style="display:block; margin-bottom:14px;">Integrations</span>
+    <h2 class="section-headline reveal" id="int-hed" style="margin-bottom:0;">Connect your stack in under 2 minutes.</h2>
+  </div>
+  <p class="int-subline reveal">One-click OAuth. No engineer needed. No CSV uploads.</p>
+  <div class="ticker-wrap">
+    <div class="ticker-row r1" id="ticker-1"></div>
+    <div class="ticker-row r2" id="ticker-2"></div>
+  </div>
+</section>
+
+
+<!-- ═══════ § 9 — FAQ ═══════ -->
+<section class="section-faq" id="faq" aria-labelledby="faq-hed">
+  <div class="container">
+    <span class="label section-label reveal">Questions</span>
+    <h2 class="section-headline reveal" id="faq-hed">The ones we get asked most.</h2>
+    <div class="faq-list reveal" role="list">
+      <div class="faq-item" role="listitem">
+        <button class="faq-q" aria-expanded="false" aria-controls="fa1">How long does setup actually take?<span class="faq-ico" aria-hidden="true">+</span></button>
+        <div class="faq-ans" id="fa1" role="region"><p class="faq-ans-inner">Under 5 minutes for most teams. Connect your CRM via OAuth, and your portfolio populates instantly — health scores, signals, renewal dates — no configuration required.</p></div>
+      </div>
+      <div class="faq-item" role="listitem">
+        <button class="faq-q" aria-expanded="false" aria-controls="fa2">Do I need an admin or ops person to manage it?<span class="faq-ico" aria-hidden="true">+</span></button>
+        <div class="faq-ans" id="fa2" role="region"><p class="faq-ans-inner">No. Bonovo is designed to be run by your CS team from day one. No dedicated admin, no implementation consultant, no ongoing maintenance overhead.</p></div>
+      </div>
+      <div class="faq-item" role="listitem">
+        <button class="faq-q" aria-expanded="false" aria-controls="fa3">What integrations do you support?<span class="faq-ico" aria-hidden="true">+</span></button>
+        <div class="faq-ans" id="fa3" role="region"><p class="faq-ans-inner">Salesforce, HubSpot, Zendesk, Slack, Gmail, Snowflake, BigQuery, Jira, Intercom, Linear, Asana, Gong, Fireflies, Granola, Google Calendar, and more — added every week.</p></div>
+      </div>
+      <div class="faq-item" role="listitem">
+        <button class="faq-q" aria-expanded="false" aria-controls="fa4">How is this different from Gainsight or Vitally?<span class="faq-ico" aria-hidden="true">+</span></button>
+        <div class="faq-ans" id="fa4" role="region"><p class="faq-ans-inner">Gainsight takes 5–9 months to implement and requires a dedicated admin. Vitally takes 2–4 weeks. Bonovo takes 5 minutes. More importantly — we're AI-native and built around the CSM doing the work, not the VP buying the tool.</p></div>
+      </div>
+      <div class="faq-item" role="listitem">
+        <button class="faq-q" aria-expanded="false" aria-controls="fa5">Is my data secure?<span class="faq-ico" aria-hidden="true">+</span></button>
+        <div class="faq-ans" id="fa5" role="region"><p class="faq-ans-inner">Yes. All data is encrypted in transit and at rest. We are SOC 2 compliant and never use your customer data to train models.</p></div>
+      </div>
+      <div class="faq-item" role="listitem">
+        <button class="faq-q" aria-expanded="false" aria-controls="fa6">What does it cost?<span class="faq-ico" aria-hidden="true">+</span></button>
+        <div class="faq-ans" id="fa6" role="region"><p class="faq-ans-inner">Pricing scales with your team size. Get in touch and we'll find the right fit.</p></div>
+      </div>
+      <div class="faq-item" role="listitem">
+        <button class="faq-q" aria-expanded="false" aria-controls="fa7">Is it just for Series B/C companies?<span class="faq-ico" aria-hidden="true">+</span></button>
+        <div class="faq-ans" id="fa7" role="region"><p class="faq-ans-inner">We're built for any team that's outgrown spreadsheets and isn't ready — or willing — to spend 6 months implementing Gainsight. Series A through mid-market.</p></div>
+      </div>
+      <div class="faq-item" role="listitem">
+        <button class="faq-q" aria-expanded="false" aria-controls="fa8">Can I try it before committing?<span class="faq-ico" aria-hidden="true">+</span></button>
+        <div class="faq-ans" id="fa8" role="region"><p class="faq-ans-inner">Yes — see it live in 5 minutes. No credit card required.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ § 10 — CTA ═══════ -->
+<section class="section-cta" aria-labelledby="cta-hed">
+  <div class="reveal">
+    <h2 class="cta-hed" id="cta-hed">Your customers deserve more than a CSM who's always catching up.</h2>
+    <div class="cta-acts">
+      <a href="#" class="btn btn-primary-dark">See it in 5 minutes</a>
+      <a href="#" class="btn btn-secondary-dark">Book a demo</a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ FOOTER ═══════ -->
+<footer class="footer" aria-label="Site footer">
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <div class="footer-logo">
+          <div class="footer-mark" aria-hidden="true">
+            <svg viewBox="0 0 20 20" fill="none" width="14" height="14">
+              <circle cx="6" cy="13.5" r="2.4" fill="white"/>
+              <circle cx="14.5" cy="6.5" r="3.2" fill="white" opacity="0.88"/>
+              <path d="M8.1 11.9 C9.8 9.8 11.8 8 11.7 7.8" stroke="white" stroke-width="1.6" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <span class="footer-wordmark">Bonovo</span>
+        </div>
+        <div class="footer-tagline">The system that runs your revenue.</div>
+      </div>
+      <nav class="footer-links" aria-label="Footer navigation">
+        <a href="#">Product</a>
+        <a href="#integrations">Integrations</a>
+        <a href="#">Security</a>
+        <a href="#">Book a demo</a>
+      </nav>
+    </div>
+    <div class="footer-bottom">
+      <span class="footer-copy">© 2026 Bonovo. All rights reserved.</span>
+      <div class="footer-legal">
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  const LOGO_TOKEN = 'pk_Zmlm9UtgQ6mh2A5FoQ9XKA';
+
+  // ── 1. STICKY NAV ──
+  const nav = document.getElementById('nav');
+  window.addEventListener('scroll', () => nav.classList.toggle('scrolled', scrollY > 40), { passive: true });
+
+  // ── 2. SCROLL REVEAL ──
+  const revObs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); revObs.unobserve(e.target); } });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.reveal').forEach(el => revObs.observe(el));
+
+
+  // ── 4. CHAOS → CLARITY SCROLL ANIMATION ──
+  const tools = [
+    { name: 'Salesforce',     domain: 'salesforce.com',        color: '#0176D3', bg: 'rgba(1,118,211,0.15)',    hasMissed: false,
+      chaos: { l:'3%',   t:'8%',  r:-9  }, ctr: { l:'36%', t:'42%' } },
+    { name: 'Slack',          domain: 'slack.com',             color: '#611F69', bg: 'rgba(97,31,105,0.15)',    hasMissed: true,
+      chaos: { l:'58%',  t:'4%',  r:7   }, ctr: { l:'44%', t:'42%' } },
+    { name: 'HubSpot',        domain: 'hubspot.com',           color: '#FF7A59', bg: 'rgba(255,122,89,0.15)',   hasMissed: false,
+      chaos: { l:'74%',  t:'22%', r:-6  }, ctr: { l:'39%', t:'46%' } },
+    { name: 'Zendesk',        domain: 'zendesk.com',           color: '#03363D', bg: 'rgba(3,54,61,0.15)',      hasMissed: true,
+      chaos: { l:'6%',   t:'54%', r:11  }, ctr: { l:'43%', t:'46%' } },
+    { name: 'Jira',           domain: 'atlassian.com',         color: '#0052CC', bg: 'rgba(0,82,204,0.15)',     hasMissed: false,
+      chaos: { l:'68%',  t:'58%', r:-8  }, ctr: { l:'41%', t:'44%' } },
+    { name: 'Google Calendar',domain: 'calendar.google.com',   color: '#1A73E8', bg: 'rgba(26,115,232,0.15)',   hasMissed: true,
+      chaos: { l:'28%',  t:'72%', r:6   }, ctr: { l:'38%', t:'44%' } },
+    { name: 'Gong',           domain: 'gong.io',               color: '#6D28D9', bg: 'rgba(109,40,217,0.15)',   hasMissed: false,
+      chaos: { l:'80%',  t:'40%', r:-13 }, ctr: { l:'45%', t:'46%' } },
+    { name: 'Gmail',          domain: 'gmail.com',             color: '#EA4335', bg: 'rgba(234,67,53,0.15)',    hasMissed: true,
+      chaos: { l:'46%',  t:'78%', r:9   }, ctr: { l:'40%', t:'44%' } },
+  ];
+
+  const stepHeadlines = [
+    'Connect your entire stack.',
+    'See your whole portfolio at once.',
+    'Know which accounts need you — right now.',
+    'Let Bonovo do the rest.'
+  ];
+
+  const chaosStage = document.getElementById('chaos-stage');
+  const bResult = document.getElementById('bonovo-result');
+  const chaosWrapper = document.getElementById('chaos-wrapper');
+  const chaosHeadline = document.getElementById('chaos-headline');
+  const stepEls = document.querySelectorAll('.cstep');
+  const toolCards = [];
+
+  // Build tool cards
+  tools.forEach(tool => {
+    const card = document.createElement('div');
+    card.className = 'tool-card';
+    card.style.cssText = `left:${tool.chaos.l};top:${tool.chaos.t};transform:rotate(${tool.chaos.r}deg);z-index:2;`;
+    card.innerHTML = `
+      <div class="tool-icon" style="background:${tool.bg}; overflow:hidden;">
+        <img src="https://img.logo.dev/${tool.domain}?token=${LOGO_TOKEN}&size=32" width="13" height="13" alt="${tool.name}" style="border-radius:2px;object-fit:contain;display:block;" loading="lazy" onerror="this.style.display='none'">
+      </div>
+      ${tool.name}
+      ${tool.hasMissed ? '<div class="missed-dot"></div>' : ''}
+    `;
+    chaosStage.appendChild(card);
+    toolCards.push(card);
+  });
+
+  function updateChaos() {
+    const rect = chaosWrapper.getBoundingClientRect();
+    const total = chaosWrapper.offsetHeight - window.innerHeight;
+    const scrolled = -rect.top;
+    const p = Math.max(0, Math.min(1, scrolled / total));
+
+    // Determine step (0-3)
+    const step = p < 0.33 ? 0 : p < 0.55 ? 1 : p < 0.75 ? 2 : 3;
+    stepEls.forEach((el, i) => el.classList.toggle('active', i === step));
+    chaosHeadline.textContent = stepHeadlines[step];
+
+    toolCards.forEach((card, i) => {
+      const t = tools[i];
+      if (p < 0.45) {
+        // Chaos: scattered
+        card.style.left = t.chaos.l; card.style.top = t.chaos.t;
+        card.style.transform = `rotate(${t.chaos.r}deg)`;
+        card.style.opacity = '1'; card.style.filter = 'none';
+      } else if (p < 0.75) {
+        // Consolidating
+        const tp = (p - 0.45) / 0.3;
+        const e = tp < 0.5 ? 2*tp*tp : -1+(4-2*tp)*tp;
+        const cl = parseFloat(t.chaos.l), cc = parseFloat(t.ctr.l);
+        const ct = parseFloat(t.chaos.t), cct = parseFloat(t.ctr.t);
+        card.style.left = `${cl + (cc - cl) * e}%`;
+        card.style.top = `${ct + (cct - ct) * e}%`;
+        card.style.transform = `rotate(${t.chaos.r * (1-e)}deg) scale(${1 - e*0.4})`;
+        card.style.opacity = `${1 - e * 0.9}`;
+        card.style.filter = `grayscale(${e * 100}%)`;
+      } else {
+        card.style.opacity = '0';
+      }
+    });
+
+    if (p > 0.73) {
+      const tp2 = Math.min(1, (p - 0.73) / 0.12);
+      bResult.style.opacity = String(tp2);
+      bResult.classList.toggle('visible', tp2 > 0.5);
+    } else {
+      bResult.style.opacity = '0';
+      bResult.classList.remove('visible');
+    }
+  }
+
+  window.addEventListener('scroll', updateChaos, { passive: true });
+  updateChaos();
+
+
+
+  // ── 7. FAQ ACCORDION ──
+  document.querySelectorAll('.faq-q').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const item = btn.closest('.faq-item');
+      const ans = btn.nextElementSibling;
+      const isOpen = item.classList.contains('active');
+      document.querySelectorAll('.faq-item').forEach(i => {
+        i.classList.remove('active');
+        i.querySelector('.faq-ans').classList.remove('open');
+        i.querySelector('.faq-q').setAttribute('aria-expanded', 'false');
+      });
+      if (!isOpen) {
+        item.classList.add('active');
+        ans.classList.add('open');
+        btn.setAttribute('aria-expanded', 'true');
+      }
+    });
+    btn.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); btn.click(); } });
+  });
+
+  // ── 8. INTEGRATION TICKER ──
+  const row1 = [
+    { name: 'Salesforce',  domain: 'salesforce.com' },
+    { name: 'HubSpot',     domain: 'hubspot.com' },
+    { name: 'Zendesk',     domain: 'zendesk.com' },
+    { name: 'Slack',       domain: 'slack.com' },
+    { name: 'Gong',        domain: 'gong.io' },
+    { name: 'Fireflies',   domain: 'fireflies.ai' },
+    { name: 'Snowflake',   domain: 'snowflake.com' },
+    { name: 'Gmail',       domain: 'gmail.com' },
+  ];
+  const row2 = [
+    { name: 'Jira',             domain: 'atlassian.com' },
+    { name: 'Intercom',         domain: 'intercom.com' },
+    { name: 'Asana',            domain: 'asana.com' },
+    { name: 'Google Calendar',  domain: 'calendar.google.com' },
+    { name: 'Linear',           domain: 'linear.app' },
+    { name: 'Notion',           domain: 'notion.so' },
+    { name: 'Google Drive',     domain: 'drive.google.com' },
+    { name: 'BigQuery',         domain: 'cloud.google.com' },
+  ];
+  function buildTicker(tools, id) {
+    const el = document.getElementById(id);
+    [tools, tools].forEach(set => {
+      set.forEach(t => {
+        const chip = document.createElement('div');
+        chip.className = 'logo-chip';
+        chip.innerHTML = `<img src="https://img.logo.dev/${t.domain}?token=${LOGO_TOKEN}&size=32" width="18" height="18" alt="${t.name}" style="border-radius:3px;object-fit:contain;display:block;" loading="lazy">${t.name}`;
+        el.appendChild(chip);
+      });
+    });
+  }
+  buildTicker(row1, 'ticker-1');
+  buildTicker(row2, 'ticker-2');
+</script>
+</body>
+</html>
